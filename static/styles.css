@@ -1,0 +1,70 @@
+@font-face {
+    font-family: 'Linux Libertine';
+    src: url('LinLibertine_Rah.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+body {
+    background: url("billy-huynh-278252-unsplash-small.jpg") fixed;
+    background-size: cover;
+    color: white;
+    margin: 0px;
+    padding: 0px;
+    font-family: 'Linux Libertine', serif;
+    line-height: 1.6em;
+    font-size: 20px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'League Gothic', Impact, sans-serif, sans;
+    color: white;
+    font-weight: normal;
+}
+
+a:link, a:visited, a:active {
+    color: #3498db;
+}
+
+a:hover {
+    color: #2980b9;
+}
+
+
+h1 > a {
+    text-decoration: none;
+}
+
+blockquote {
+    border: 1px solid #3498db;
+    border-left: 5px solid #3498db;
+    padding: 15px 30px;
+    text-align: justify;
+}
+
+blockquote > p {
+    font-size: 1.2em;
+}
+
+#overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: -99;
+    transform: translateX(-50%) translateY(-50%);
+    background: url(overlay-video-dark.png);
+}
+
+#container {
+    max-width: 777px;
+    background: hsla(0, 0%, 0%, 0.9);
+    margin: 100px auto;
+    padding: 15px 30px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px black;
+}
