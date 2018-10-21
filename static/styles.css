@@ -17,12 +17,6 @@ body {
     font-size: 20px;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'League Gothic', Impact, sans-serif, sans;
-    color: white;
-    font-weight: normal;
-}
-
 a:link, a:visited, a:active {
     color: #3498db;
 }
