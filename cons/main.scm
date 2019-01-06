@@ -323,24 +323,24 @@
               (retry-exercice model))))))))
 
 (define (view model)
-  `(div (@ (id "container"))
-        ,(make-stdout intro)
-        ,@(let loop ((convo (ref model 'convo))
-                     (out '()))
-            (match convo
-              ('() out)
-              (((exercice input response) rest ...)
-                (loop rest
-                      (append out (list (make-stdout exercice)
-                                        (make-stdin input)
-                                        (make-stdout response)))))))
-        ,(make-stdout (car (list-ref exercices (ref model 'index))))
-        (form (@ (onSubmit ,onSubmit))
-              (input (@ (id "input")
-                        (autoFocus #t)
-                        (type "text")
-                        (value ,(ref model 'input))
-                        (onChange ,onChange))))))
+  `(div
+    ,(make-stdout intro)
+    ,@(let loop ((convo (ref model 'convo))
+                 (out '()))
+        (match convo
+          ('() out)
+          (((exercice input response) rest ...)
+           (loop rest
+                 (append out (list (make-stdout exercice)
+                                   (make-stdin input)
+                                   (make-stdout response)))))))
+    ,(make-stdout (car (list-ref exercices (ref model 'index))))
+    (form (@ (onSubmit ,onSubmit))
+          (input (@ (id "input")
+                    (autoFocus #t)
+                    (type "text")
+                    (value ,(ref model 'input))
+                    (onChange ,onChange))))))
 
 (create-app init view)
 
