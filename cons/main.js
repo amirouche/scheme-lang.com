@@ -1,23 +1,19 @@
-import '../static/snabbdom.js';
-import '../static/snabbdom-attributes.js';
-import '../static/snabbdom-eventlisteners.js';
-
+let ReactDOM = helpers.default.ReactDOM;
+let h = helpers.default.h;
 
 let container = document.getElementById('container');
 
-let patch = snabbdom.init([
-    snabbdom_attributes.default,
-    snabbdom_eventlisteners.default,
-]);
-
-let h = snabbdom.h;
 
 document.recv = function() {
     let json = document.javascript;
-    container = patch(container, translate(json))
+    ReactDOM.render(
+        translate(json),
+        container,
+    );
 }
 
 let send = function(event, identifier) {
+    event.preventDefault();
     var msg = {
         "identifier": identifier,
         "event": {'target.value': event.target.value},
@@ -34,24 +30,24 @@ let makeCallback = function(identifier) {
 
 /* Translate json to `vnode` using `h` snabbdom helper */
 let translate = function(json) {
-    let on = json.options.on;
-    for (let key in on) {
-        on[key] = makeCallback(on[key]);
+    let options = json.options || {};
+    for (let key in options) {
+        if(key.startsWith('on')) {
+            options[key] = makeCallback(options[key]);
+        }
     }
 
     // recurse to translate children
-    let children = [];
-    if (json.children !== undefined) {
-        children = json.children.map(function(child) {  // TODO: optimize with a for-loop
-            if (child instanceof Object) {
-                return translate(child);
-            } else { // it's a string or a number
-                return child;
-            }
-        });
-    }
+    let children = json.children || [];
+    children = children.map(function(child) {  // TODO: optimize with a for-loop
+        if (child instanceof Object) {
+            return translate(child);
+        } else { // it's a string or a number
+            return child;
+        }
+    });
 
-    return h(json.tag, json.options, children);
+    return h(json.tag, options, children);
 }
 
 

@@ -12,11 +12,6 @@
 
 (write-string "chibi scheme is running...\n")
 
-;; (eval-script! "window.addEventListener('click', function () {
-;;   document.inbox += 1;
-;;   Module['resume'](); // give control back to the Scheme process
-;; })")
-
 (eval-script! "document.resume = Module['resume']")
 
 ;; scheme helpers
@@ -189,41 +184,29 @@
       (children . ,children)))
 
 
-(define (%magic options)
-  ;; prepare options for sexp->json
-  `((attrs . ,(cons '@ (or (ref options 'attrs) '())))
-    (on . ,(cons '@ (or (ref options 'on) '())))
-    (key . ,(or (ref* options 'attrs 'key) '()))))
-
 (define (magic attrs next-identifier)
-  ;; shake around the attrs to make them compatible with snabbdom
-  ;; options, associate callbacks to integer identifiers. The event on
-  ;; a given node is associated with an integer, the integer is
-  ;; associated with a callback. Return both snabbdom options and
-  ;; callbacks assoc.
-  (let loop1 ((attrs attrs)
-              (next-identifier next-identifier)
-              (out '())
-              (callbacks '()))
+  ;; shake around the attrs to make them compatible with
+  ;; react-hyperscript options, associate callbacks to integer
+  ;; identifiers. The event on a given node is associated with an
+  ;; integer, the integer is associated with a callback. Return both
+  ;; react-hyperscript options and callbacks assoc.
+  (let loop ((attrs attrs)
+             (next-identifier next-identifier)
+             (out '())
+             (callbacks '()))
     (if (null? attrs)
-        (values (%magic out) callbacks)
+        (values out callbacks)
         (match attrs
-          ((('on . handlers) rest ...)
-           (let loop2 ((handlers handlers)
-                       (next-identifier next-identifier)
-                       (out out)
-                       (callbacks callbacks))
-             (match handlers
-               ('() (loop1 rest next-identifier out callbacks))
-               (((event-name callback) handlers ...)
-                (loop2 handlers
-                       (+ 1 next-identifier)
-                       (set* out 'on event-name next-identifier)
-                       (acons next-identifier callback callbacks))))))
-          (((key value) attrs ...) (loop1 attrs
-                                          next-identifier
-                                          (set* out 'attrs key value)
-                                          callbacks))))))
+          (((key value) rest ...)
+           (if (procedure? value)
+               (loop rest
+                     (+ 1 next-identifier)
+                     (acons key next-identifier out)
+                     (acons next-identifier value callbacks))
+               (loop rest
+                     next-identifier
+                     (acons key value out)
+                     callbacks)))))))
 
 (define (%sxml->snabbdom+callbacks sxml callbacks)
   (match sxml
@@ -285,7 +268,9 @@
   (eval (string->scm string) (environment '(scheme base))))
 
 (define (init)
-  0)
+  '((index . 0)
+    (input . "")
+    (convo . ())))
 
 (define intro "Learning a new language is long adventure of correct and wrong.  Here through this interface that mimics an REPL you will learn Scheme programming language.")
 
@@ -297,30 +282,65 @@
     ("Err!!!..." '(please-fix-the-bug))))
 
 (define (make-stdout string)
-  `(div (@ (class "stdout")) ,(string-append ";; " string)))
+  `(div (@ (className "stdout")) ,(string-append ";; " string)))
 
-(define (callback model event)
-  (let ((out (eval-string (pk (ref* event 'event 'target.value)))))
-    (if (equal? out (pk (cdr (pk (list-ref exercices (pk model))))))
-        (+ 1 model)
-        model)))
+(define (make-stdin string)
+  `(div (@ (className "stdin")) ,string))
+
+(define (onChange model event)
+  (let ((input (ref* event 'event 'target.value)))
+    (set model 'input input)))
+
+(define (clear-input model)
+  (set model 'input ""))
+
+(define (next-exercice model)
+  (let* ((input (ref model 'input))
+         (convo (ref model 'convo))
+         (index (ref model 'index))
+         (exercice (car (list-ref exercices index))))
+    (let ((new (append convo (list (list exercice input "Ok!")))))
+      (clear-input (set (set model 'convo new) 'index (+ 1 index))))))
+
+(define (retry-exercice model)
+  (let* ((input (ref model 'input))
+         (convo (ref model 'convo))
+         (index (ref model 'index))
+         (exercice (car (list-ref exercices index))))
+    (let ((new (append convo (list (list exercice input "Wrong?!")))))
+      (clear-input (set model 'convo new)))))
+
+(define (onSubmit model event)
+  (call/cc
+   (lambda (k)
+     (with-exception-handler
+      (lambda _
+        (k (retry-exercice model)))
+      (lambda ()
+        (let ((out (eval-string (ref model 'input))))
+          (if (equal? out (cdr (list-ref exercices (ref model 'index))))
+              (next-exercice model)
+              (retry-exercice model))))))))
 
 (define (view model)
   `(div (@ (id "container"))
         ,(make-stdout intro)
-        ,@(let loop ((exercices exercices)
-                     (out '())
-                     (index 0))
-            (if (< model index)
-                (reverse out)
-                (loop (cdr exercices)
-                      (cons (make-stdout (caar exercices)) out)
-                      (+ 1 index))))
-        (input (@ (id "input")
-                  (focus "true")
-                  (key ,(number->string model))
-                  (type "text")
-                  (on (change ,callback))))))
+        ,@(let loop ((convo (ref model 'convo))
+                     (out '()))
+            (match convo
+              ('() out)
+              (((exercice input response) rest ...)
+                (loop rest
+                      (append out (list (make-stdout exercice)
+                                        (make-stdin input)
+                                        (make-stdout response)))))))
+        ,(make-stdout (car (list-ref exercices (ref model 'index))))
+        (form (@ (onSubmit ,onSubmit))
+              (input (@ (id "input")
+                        (autoFocus #t)
+                        (type "text")
+                        (value ,(ref model 'input))
+                        (onChange ,onChange))))))
 
 (create-app init view)
 
