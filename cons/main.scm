@@ -277,7 +277,7 @@
 (define exercices
   '(("What is (+ 41 1)" . 42)
     ("What is (+ 1 99 1)" . 101)
-    ("What is (* 2 3 4)" . 18)
+    ("What is (* 2 3 4)" . 24)
     ("What is (+ (* 100 10) 330 7)" . 1337)
     ("Err!!!..." '(please-fix-the-bug))))
 
