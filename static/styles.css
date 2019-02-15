@@ -1,6 +1,4 @@
 @font-face {
-    font-family: 'Linux Libertine';
-    src: url('LinLibertine_Rah.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 
@@ -11,12 +9,13 @@
 }
 
 body {
+    background-color: black;
     background: url("billy-huynh-278252-unsplash-small.jpg") fixed;
     background-size: cover;
     color: white;
     margin: 0px;
     padding: 0px;
-    font-family: 'Linux Libertine', serif;
+    font-family: serif;
     line-height: 1.6em;
     font-size: 20px;
 }
@@ -65,6 +64,7 @@ blockquote > p {
     padding: 15px 30px;
     border-radius: 5px;
     box-shadow: 0px 0px 5px black;
+    text-align: justify;
 }
 
 .stdout {
