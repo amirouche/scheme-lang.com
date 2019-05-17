@@ -1,7 +1,36 @@
 @font-face {
-    font-weight: normal;
-    font-style: normal;
+  font-family: "EB Garamond";
+  src: url("EBGaramond12-Regular.ttf");
+}
 
+@font-face {
+  font-family: "Linux Biolinum";
+  src: url("LinBiolinum_Rah.ttf");
+}
+
+@font-face {
+  font-family: Hack;
+  src: url("Hack-Regular.ttf");
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+  font-family: "EB Garamond", serif;
+  background: url("graphy.png");
+  font-size: 24px;
+  color: white;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Linux Biolinum", sans;
+}
+
+code, pre {
+  font-family: Hack, mono, monospace;
+  font-size: 0.7em;
 }
 
 * {
@@ -12,12 +41,9 @@ body {
     background-color: black;
     background: url("billy-huynh-278252-unsplash-small.jpg") fixed;
     background-size: cover;
-    color: white;
     margin: 0px;
     padding: 0px;
-    font-family: serif;
     line-height: 1.6em;
-    font-size: 20px;
 }
 
 a:link, a:visited, a:active {
@@ -68,13 +94,13 @@ blockquote > p {
 }
 
 .stdout {
-    font-family: mono, monospace;
+    font-family: Hack, mono, monospace;
     color: #BBB;
     margin-bottom: 5px;
 }
 
 .stdin {
-    font-family: mono, monospace;
+    font-family: Hack, mono, monospace;
     color: #777;
     background: hsla(0, 0%, 0%, 0.9);
     padding: 5px 10px;
@@ -87,6 +113,6 @@ blockquote > p {
     border: 1px solid white;
     width: 100%;
     padding: 5px 10px;
-    font-family: mono, monospace;
+    font-family: Hack, mono, monospace;
     font-size: 20px;
 }
